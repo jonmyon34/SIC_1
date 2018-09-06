@@ -1,3 +1,28 @@
+
+#define PL_WIDTH 28
+#define PL_HEIGHT 28
+#define PL_SPEED_MAX 9
+#define PL_SPEED_INC 0.2
+
+
+//å¸Ç´Ç…ëŒÇµÇƒÇÃèâä˙à íu
+#define PL_UP_FIRST_X WINDOW_X/2
+#define PL_UP_FIRST_Y WINDOW_Y/3
+
+#define PL_DOWN_FIRST_X WINDOW_X/2
+#define PL_DOWN_FIRST_Y WINDOW_Y/3*2
+
+#define PL_LEFT_FIRST_X WINDOW_X/4
+#define PL_LEFT_FIRST_Y WINDOW_Y/2
+
+#define PL_RIGHT_FIRST_X WINDOW_X/4*3
+#define PL_RIGHT_FIRST_Y WINDOW_Y/2
+
+#define PL_MAX_ACCELERATION 6
+
+bool checkHitBlock(int, int);
+
+
 class player
 {
 public:
@@ -11,12 +36,15 @@ public:
 	int item;
 
 	bool hitFlg;
+	bool damageFlg;
 
 	int directionMode;
 	bool invincibleFlg;
 
 	int player_gh;
+
 	int flashCnt;
+	int acceleCnt;
 
 	bool plLiveFlg;
 
@@ -26,18 +54,25 @@ public:
 		y = WINDOW_Y / 3;
 		pos_x = WINDOW_X / 2;
 		pos_y = WINDOW_Y / 3;
-		width = 32;
-		height = 32;
+		width = PL_WIDTH;
+		height = PL_HEIGHT;
+
+		speed = 0;
+		acceleration = 1;
+
+		hp = 3;
 
 		hitFlg = false;
+		damageFlg = false;
 		directionMode = 0;
 		invincibleFlg = false;
 
-		speed = 0;
 
-		player_gh = LoadGraph("Ps_pl.png");
+		player_gh = LoadGraph("player1.png");
 
 		flashCnt = 0;
+		acceleCnt = 0;
+
 	}
 
 	void Move()
@@ -115,21 +150,22 @@ public:
 
 	void View()
 	{
-		switch (hitFlg)
+		switch (damageFlg)
 		{
 		case false:
-		DrawExtendGraph(pos_x, pos_y, pos_x + width, pos_y + height, player_gh, true);
+		DrawRectGraph(pos_x, pos_y, 0, 0, PL_WIDTH, PL_HEIGHT, player_gh, true, false);
 		break;
 
 		case true:
 			if (((flashCnt / 10) % 2)&&flashCnt<FLASHCNT_MAX)
 			{
-				DrawExtendGraph(pos_x, pos_y, pos_x + width, pos_y + height, player_gh, true);
+				DrawRectGraph(pos_x, pos_y, 0, 0, PL_WIDTH, PL_HEIGHT, player_gh, true, false);
 				flashCnt++;
 			}
 			else if (flashCnt >= FLASHCNT_MAX)
 			{
-				hitFlg = false;
+				damageFlg = false;
+				invincibleFlg = false;
 				flashCnt = 0;
 			}
 			else
@@ -140,10 +176,30 @@ public:
 		}
 	}
 
+	void Accele()
+	{
+		if (acceleCnt >= 120)
+		{
+			acceleration++;
+			acceleCnt = 0;
+		}
+		else
+		{
+			acceleCnt++;
+		}
+
+		if (hitFlg && !invincibleFlg)
+		{
+			acceleration--;
+			invincibleFlg = true;
+		}
+	}
+
 	void All()
 	{
 		Move();
 		View();
+		Accele();
 	}
 
 

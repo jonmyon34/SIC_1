@@ -1,8 +1,23 @@
 #include"all.h"
 
-bool checkHitObject(int acceleration, int object)
+bool checkHitBlock(int pl_pos_x, int bl_pos_x)
 {
-	if (acceleration == 0 && object == true)
+	if (pl_pos_x + PL_WIDTH > bl_pos_x && bl_pos_x + BLOCK_WIDTH > pl_pos_x)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void checkBreakBlock(int blNumber,int acceleration)
+{
+
+}
+
+bool checkHitStop(int acceleration, int block)
+{
+	if (acceleration == 0 && block == true)
 	{
 		return true;
 	}
